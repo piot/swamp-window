@@ -1,0 +1,14 @@
+[package]
+name = "swamp-window"
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+description = "Easily create and manage windows across multiple platforms for game applications, leveraging the power of the `winit` library."
+repository = "https://github.com/piot/swamp-window"
+categories = ["game-development"]
+keywords = ["game", "window"]
+
+[dependencies]
+winit = { version = "0.30.5", features = ["rwh_05"] }
+pollster = "0.4.0"
+async-trait = "0.1.83"
