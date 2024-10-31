@@ -6,7 +6,8 @@ use winit::dpi;
 use winit::error::EventLoopError;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
-use winit::window::{Window, WindowId};
+use winit::window::{Window, WindowAttributes, WindowId};
+use winit::platform::macos::WindowAttributesExtMacOS;
 
 /// A trait for handling application-specific window creation and management.
 ///
@@ -55,13 +56,18 @@ pub trait AppHandler {
 pub struct App<'a> {
     window: Option<Arc<Window>>,
     handler: &'a mut (dyn AppHandler),
+    window_attributes: WindowAttributes,
 }
 
 impl<'a> App<'a> {
-    pub fn new(handler: &'a mut dyn AppHandler) -> Self {
+    pub fn new(handler: &'a mut dyn AppHandler, title: &str) -> Self {
+        let window_attributes = WindowAttributes::default()
+            .with_title(title)
+            .with_has_shadow(true);
         Self {
             handler,
             window: None,
+            window_attributes,
         }
     }
 }
@@ -70,17 +76,16 @@ impl ApplicationHandler for App<'_> {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         if self.window.is_none() {
             info!("creating new window");
+
             let window = Arc::new(
                 event_loop
-                    .create_window(Window::default_attributes())
+                    .create_window(self.window_attributes.clone())
                     .unwrap(),
             );
             self.window = Some(window.clone());
 
             pollster::block_on(self.handler.create_window(window));
             info!("created the window");
-            // This tells winit that we want another frame after this one
-            // self.window.as_ref().unwrap().request_redraw();
         }
     }
 
@@ -177,10 +182,10 @@ impl WindowRunner {
     ///    }
     /// }
     /// ```
-    pub fn run_app(handler: &mut dyn AppHandler) -> Result<(), EventLoopError> {
+    pub fn run_app(handler: &mut dyn AppHandler, title: &str) -> Result<(), EventLoopError> {
         let event_loop = EventLoop::new()?;
         event_loop.set_control_flow(ControlFlow::Poll);
-        let mut app = App::new(handler);
+        let mut app = App::new(handler, title);
         let _ = event_loop.run_app(&mut app);
         Ok(())
     }
