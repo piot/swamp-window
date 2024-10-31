@@ -104,7 +104,6 @@ impl ApplicationHandler for App<'_> {
                 self.window.as_ref().unwrap().request_redraw();
 
                 if self.window.is_some() {
-                    info!("redraw");
                     self.handler.redraw();
                 }
             }
