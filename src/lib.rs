@@ -1,6 +1,8 @@
 use async_trait::async_trait;
+use log::info;
 use std::sync::Arc;
 use winit::application::ApplicationHandler;
+use winit::dpi;
 use winit::error::EventLoopError;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
@@ -30,6 +32,7 @@ pub trait AppHandler {
     /// use swamp_window::AppHandler;
     /// use std::sync::Arc;
     /// use winit::window::Window;
+    /// use winit::dpi;
     ///
     /// struct MyApp;
     ///
@@ -38,9 +41,15 @@ pub trait AppHandler {
     ///     async fn create_window(&mut self, window: Arc<Window>) {
     ///         // Custom window initialization code here
     ///     }
+    /// fn redraw(&mut self) { todo!() }
+    /// fn resized(&mut self, size: dpi::PhysicalSize<u32>) { todo!() }
     /// }
     /// ```
     async fn create_window(&mut self, window: Arc<Window>);
+
+    fn resized(&mut self, size: dpi::PhysicalSize<u32>);
+
+    fn redraw(&mut self);
 }
 
 pub struct App<'a> {
@@ -60,6 +69,7 @@ impl<'a> App<'a> {
 impl ApplicationHandler for App<'_> {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         if self.window.is_none() {
+            info!("creating new window");
             let window = Arc::new(
                 event_loop
                     .create_window(Window::default_attributes())
@@ -68,6 +78,9 @@ impl ApplicationHandler for App<'_> {
             self.window = Some(window.clone());
 
             pollster::block_on(self.handler.create_window(window));
+            info!("created the window");
+            // This tells winit that we want another frame after this one
+            // self.window.as_ref().unwrap().request_redraw();
         }
     }
 
@@ -80,11 +93,20 @@ impl ApplicationHandler for App<'_> {
             WindowEvent::CloseRequested => {
                 event_loop.exit();
             }
-            WindowEvent::Resized(_) => {
-                // TODO: Add callback to AppHandler
+            WindowEvent::Resized(physical_size) => {
+                self.handler.resized(physical_size);
+
+                // This tells winit that we want another frame after this one
+                self.window.as_ref().unwrap().request_redraw();
             }
             WindowEvent::RedrawRequested => {
-                // TODO: Add callback to AppHandler
+                // This tells winit that we want another frame after this one
+                self.window.as_ref().unwrap().request_redraw();
+
+                if self.window.is_some() {
+                    info!("redraw");
+                    self.handler.redraw();
+                }
             }
             _ => {}
         }
@@ -133,6 +155,7 @@ impl WindowRunner {
     /// use swamp_window::AppHandler;
     /// use std::sync::Arc;
     /// use winit::window::Window;
+    /// use winit::dpi;
     ///
     /// struct MyApp;
     ///
@@ -141,6 +164,9 @@ impl WindowRunner {
     ///     async fn create_window(&mut self, window: Arc<Window>) {
     ///         // Custom window initialization code here
     ///     }
+    ///
+    /// fn redraw(&mut self) { todo!() }
+    /// fn resized(&mut self, size: dpi::PhysicalSize<u32>) { todo!() }
     /// }
     ///
     /// let mut my_app = MyApp;

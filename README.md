@@ -1,6 +1,6 @@
 # 🌿 Swamp Window 🌿
 
-`swamp-window` is a cross-platform crate designed to simplify window creation for game applications. 
+`swamp-window` is a cross-platform crate designed to simplify window creation for game applications.
 Whether you're targeting Windows, macOS, or Linux, `swamp-window` abstracts the complexities,
 allowing you to focus on what matters most: your game!
 
@@ -15,5 +15,5 @@ To use `swamp-window`, add it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-swamp-window = "0.0.1"
+swamp-window = "0.0.2"
 ```
