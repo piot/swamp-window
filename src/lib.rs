@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use log::info;
 use std::sync::Arc;
 use winit::application::ApplicationHandler;
@@ -14,7 +13,6 @@ use winit::platform::macos::WindowAttributesExtMacOS;
 /// The `AppHandler` trait defines the behavior required for handling
 /// the creation of application windows. Implementing this trait allows
 /// for customized window management tailored to the needs of your application.
-#[async_trait]
 pub trait AppHandler {
 
     fn create_window(&mut self, window: Arc<Window>);
