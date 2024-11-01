@@ -5,8 +5,8 @@ use winit::dpi;
 use winit::error::EventLoopError;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
-use winit::window::{Window, WindowAttributes, WindowId};
 use winit::platform::macos::WindowAttributesExtMacOS;
+use winit::window::{Window, WindowAttributes, WindowId};
 
 /// A trait for handling application-specific window creation and management.
 ///
@@ -14,7 +14,6 @@ use winit::platform::macos::WindowAttributesExtMacOS;
 /// the creation of application windows. Implementing this trait allows
 /// for customized window management tailored to the needs of your application.
 pub trait AppHandler {
-
     fn create_window(&mut self, window: Arc<Window>);
 
     fn resized(&mut self, size: dpi::PhysicalSize<u32>);
