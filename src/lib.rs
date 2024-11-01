@@ -16,37 +16,8 @@ use winit::platform::macos::WindowAttributesExtMacOS;
 /// for customized window management tailored to the needs of your application.
 #[async_trait]
 pub trait AppHandler {
-    /// Creates a new window for the application.
-    ///
-    /// This asynchronous method is called when a new window needs to be created.
-    /// It provides a reference to the newly created `Window` wrapped in an `Arc`,
-    /// allowing for shared ownership and safe concurrent access.
-    ///
-    /// # Parameters
-    ///
-    /// - `window`: An `Arc<Window>` representing the newly created window.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use async_trait::async_trait;
-    /// use swamp_window::AppHandler;
-    /// use std::sync::Arc;
-    /// use winit::window::Window;
-    /// use winit::dpi;
-    ///
-    /// struct MyApp;
-    ///
-    /// #[async_trait]
-    /// impl AppHandler for MyApp {
-    ///     async fn create_window(&mut self, window: Arc<Window>) {
-    ///         // Custom window initialization code here
-    ///     }
-    /// fn redraw(&mut self) { todo!() }
-    /// fn resized(&mut self, size: dpi::PhysicalSize<u32>) { todo!() }
-    /// }
-    /// ```
-    async fn create_window(&mut self, window: Arc<Window>);
+
+    fn create_window(&mut self, window: Arc<Window>);
 
     fn resized(&mut self, size: dpi::PhysicalSize<u32>);
 
@@ -84,7 +55,7 @@ impl ApplicationHandler for App<'_> {
             );
             self.window = Some(window.clone());
 
-            pollster::block_on(self.handler.create_window(window));
+            self.handler.create_window(window);
             info!("created the window");
         }
     }
