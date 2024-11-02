@@ -1,3 +1,5 @@
+use crate::dpi::LogicalSize;
+use crate::dpi::PhysicalSize;
 use log::info;
 use std::sync::Arc;
 use winit::application::ApplicationHandler;
@@ -18,6 +20,8 @@ pub trait AppHandler {
 
     fn resized(&mut self, size: dpi::PhysicalSize<u32>);
 
+    fn min_size(&self) -> (u16, u16);
+
     fn redraw(&mut self);
 }
 
@@ -25,17 +29,26 @@ pub struct App<'a> {
     window: Option<Arc<Window>>,
     handler: &'a mut (dyn AppHandler),
     window_attributes: WindowAttributes,
+    next_resize: Option<PhysicalSize<u32>>,
 }
 
 impl<'a> App<'a> {
-    pub fn new(handler: &'a mut dyn AppHandler, title: &str) -> Self {
+    pub fn new(
+        handler: &'a mut dyn AppHandler,
+        title: &str,
+        min_width: u16,
+        min_height: u16,
+    ) -> Self {
+        let min_size = LogicalSize::new(min_width as f64, min_height as f64);
         let window_attributes = WindowAttributes::default()
             .with_title(title)
-            .with_has_shadow(true);
+            .with_resizable(true)
+            .with_min_inner_size(min_size);
         Self {
             handler,
             window: None,
             window_attributes,
+            next_resize: None,
         }
     }
 }
@@ -67,12 +80,16 @@ impl ApplicationHandler for App<'_> {
                 event_loop.exit();
             }
             WindowEvent::Resized(physical_size) => {
-                self.handler.resized(physical_size);
+                self.next_resize = Some(physical_size);
 
                 // This tells winit that we want another frame after this one
                 self.window.as_ref().unwrap().request_redraw();
             }
             WindowEvent::RedrawRequested => {
+                if let Some(next_resize) = self.next_resize {
+                    self.handler.resized(next_resize);
+                    self.next_resize = None;
+                }
                 // This tells winit that we want another frame after this one
                 self.window.as_ref().unwrap().request_redraw();
 
@@ -153,7 +170,8 @@ impl WindowRunner {
     pub fn run_app(handler: &mut dyn AppHandler, title: &str) -> Result<(), EventLoopError> {
         let event_loop = EventLoop::new()?;
         event_loop.set_control_flow(ControlFlow::Poll);
-        let mut app = App::new(handler, title);
+        let (min_width, min_height) = handler.min_size();
+        let mut app = App::new(handler, title, min_width, min_height);
         let _ = event_loop.run_app(&mut app);
         Ok(())
     }
