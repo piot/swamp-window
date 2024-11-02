@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Peter Bjorklund. All rights reserved. https://github.com/piot/swamp-window
+ * Licensed under the MIT License. See LICENSE in the project root for license information.
+ */
+
 use crate::dpi::LogicalSize;
 use crate::dpi::PhysicalSize;
 use log::info;
@@ -7,7 +12,6 @@ use winit::dpi;
 use winit::error::EventLoopError;
 use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
-use winit::platform::macos::WindowAttributesExtMacOS;
 use winit::window::{Window, WindowAttributes, WindowId};
 
 /// A trait for handling application-specific window creation and management.
