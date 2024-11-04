@@ -204,14 +204,13 @@ impl ApplicationHandler for App<'_> {
     }
 
     fn device_event(&mut self, _: &ActiveEventLoop, _: DeviceId, event: DeviceEvent) {
-        match event {
-            DeviceEvent::MouseMotion { delta } => {
-                if self.is_focused {
-                    self.handler.mouse_motion(delta);
-                }
+        if let DeviceEvent::MouseMotion { delta } = event {
+            if self.is_focused {
+                self.handler.mouse_motion(delta);
             }
-
-            // ----------------
+        }
+        /*
+        match event {
             // DeviceEvent::MouseWheel { .. } => {},
             //DeviceEvent::Button { .. } => { }
             //DeviceEvent::Added => {}
@@ -220,6 +219,7 @@ impl ApplicationHandler for App<'_> {
             //DeviceEvent::Key(_) => {}
             _ => {}
         }
+         */
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, id: WindowId, event: WindowEvent) {
