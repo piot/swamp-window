@@ -1,6 +1,6 @@
 [package]
 name = "swamp-window"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 license = "MIT"
 description = "Easily create and manage windows across multiple platforms for game applications, leveraging the power of the `winit` library."
