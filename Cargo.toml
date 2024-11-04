@@ -11,3 +11,6 @@ keywords = ["game", "window"]
 [dependencies]
 winit = { version = "0.30.5", features = ["rwh_05"] }
 log = "0.4.22"
+
+[dev-dependencies]
+env_logger = "0.11.5"
